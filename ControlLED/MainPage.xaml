@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:view="clr-namespace:ControlLED.View"
+             x:Class="ControlLED.MainPage">
+
+    <StackLayout>
+        <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
+            <Label Text="Control LED" HorizontalTextAlignment="Center" TextColor="White" FontSize="24"/>
+        </Frame>
+        <view:SliderLedPwm Margin="10" Padding="10" />
+        <Label/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Entry Placeholder="IP-address" HorizontalTextAlignment="Center"/>
+            <Entry Placeholder="Port" HorizontalTextAlignment="Center" Grid.Column="1"/>
+        </Grid>
+        <Button Text="SET" />
+    </StackLayout>
+</ContentPage>
