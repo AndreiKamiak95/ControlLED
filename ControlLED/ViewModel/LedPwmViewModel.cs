@@ -14,11 +14,38 @@ namespace ControlLED.Classes
         public LedPwmViewModel()
         {
             tcpChannelViewModel = new TcpChannelViewModel();
+            
+        }
+
+        public string IpAddress
+        {
+            get => tcpChannelViewModel.IpAddress;
+            set
+            {
+                if (tcpChannelViewModel.IpAddress != value)
+                {
+                    tcpChannelViewModel.IpAddress = value;
+                    OnPropertyChanged("IpAddress");
+                }
+            }
+        }
+
+        public int Port
+        {
+            get => tcpChannelViewModel.Port;
+            set
+            {
+                if (tcpChannelViewModel.Port != value)
+                {
+                    tcpChannelViewModel.Port = value;
+                    OnPropertyChanged("Port");
+                }
+            }
         }
 
         public byte ChangePwm
         {
-            get { return tcpChannelViewModel.PWM; }
+            get => tcpChannelViewModel.PWM;
             set
             {
                 if (tcpChannelViewModel.PWM != value)
@@ -28,10 +55,10 @@ namespace ControlLED.Classes
                 }
             }
         }
-        
+
         public bool ChangeWork
         {
-            get { return tcpChannelViewModel.StatusWork; }
+            get => tcpChannelViewModel.StatusWork;
             set
             {
                 if (tcpChannelViewModel.StatusWork != value)

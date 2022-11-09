@@ -1,4 +1,5 @@
 ﻿using ControlLED.Classes;
+using ControlLED.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,6 +15,7 @@ namespace ControlLED
         public MainPage()
         {
             InitializeComponent();
+            BindingContext = new TcpChannelViewModel();
         }
     }
 }

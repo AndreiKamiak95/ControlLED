@@ -5,13 +5,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using ControlLED.Classes;
+using Xamarin.Essentials;
 
 namespace ControlLED.Model
 {
     class TcpChannel
     {
-        public string IpAddress { get; set; } = "192.168.137.214";
-        public int Port { get; set; } = 80;
+        public string IpAddress { get; set; }
+        public int Port { get; set; }
 
         TcpClient tcpClient;
         NetworkStream networkStream;
@@ -41,13 +42,6 @@ namespace ControlLED.Model
 
         private TcpChannel()
         {
-            if (!string.IsNullOrEmpty(IpAddress))
-            {
-                tcpClient = new TcpClient(IpAddress, Port);
-                networkStream = tcpClient.GetStream();
-                taskListenServer = new Task(ListenServer);
-                taskListenServer.Start();
-            }
         }
 
         public void ChangeIpAddresAndPort(string ipAddress, int port)
@@ -77,12 +71,26 @@ namespace ControlLED.Model
                 {
                     byte[] recvData = new byte[networkStream.Length];
                     networkStream.Read(recvData, 0, recvData.Length);
-                    LedPwm ledPwm = new LedPwm();
-                    ledPwm.PWM = recvData[0];
-                    ledPwm.StatusWork = Convert.ToBoolean(recvData[1]);
+                    LedPwm ledPwm = new LedPwm
+                    {
+                        PWM = recvData[0],
+                        StatusWork = Convert.ToBoolean(recvData[1])
+                    };
                     ReceiveLedPwm?.Invoke(ledPwm);
                 }
             }
+        }
+
+        public void Connect()
+        {
+            if (string.IsNullOrEmpty(IpAddress))
+            {
+                return;
+            }
+            tcpClient = new TcpClient(IpAddress, Port);
+            networkStream = tcpClient.GetStream();
+            taskListenServer = new Task(ListenServer);
+            taskListenServer.Start();
         }
     }
 }
