@@ -15,7 +15,8 @@ namespace ControlLED
         public MainPage()
         {
             InitializeComponent();
-            BindingContext = new TcpChannelViewModel();
+            //BindingContext = new TcpChannelViewModel();
+            BindingContext = LedPwmViewModel.TcpChannelViewModel;
         }
     }
 }

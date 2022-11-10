@@ -28,5 +28,6 @@
             </Entry>
         </Grid>
         <Button Text="Connect" Command="{Binding NewConnectionCommand}"/>
+        <Label Text="{Binding StatusConnection, Mode=TwoWay}" HorizontalTextAlignment="Center"/>
     </StackLayout>
 </ContentPage>

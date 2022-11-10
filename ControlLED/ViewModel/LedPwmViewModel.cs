@@ -9,12 +9,15 @@ namespace ControlLED.Classes
     class LedPwmViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        private TcpChannelViewModel tcpChannelViewModel;
+        private static TcpChannelViewModel tcpChannelViewModel;
+        public static TcpChannelViewModel TcpChannelViewModel
+        {
+            get => tcpChannelViewModel;
+        }
 
         public LedPwmViewModel()
         {
             tcpChannelViewModel = new TcpChannelViewModel();
-            
         }
 
         public string IpAddress

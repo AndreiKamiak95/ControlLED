@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using ControlLED.Classes;
-using Xamarin.Essentials;
+using System.Timers;
 
 namespace ControlLED.Model
 {
-    class TcpChannel
+    internal class TcpChannel
     {
         public string IpAddress { get; set; }
         public int Port { get; set; }
@@ -19,8 +16,13 @@ namespace ControlLED.Model
         Task taskListenServer;
         public delegate void RecieveLedPwm(LedPwm ledPwm);
         public event RecieveLedPwm ReceiveLedPwm;
-
-
+        Timer timer;
+        short countSeconds = 0;
+        short timeOutConnected = 10;
+        IAsyncResult rezult;
+        public delegate void TcpChannelHandler();
+        public event TcpChannelHandler ErrorConnection;
+        public event TcpChannelHandler SuccessfulConnection;
 
         private static object syncRoot = new object(); //lock
         private static TcpChannel instance;
@@ -42,11 +44,29 @@ namespace ControlLED.Model
 
         private TcpChannel()
         {
+            tcpClient = new TcpClient();
+            timer = new Timer
+            {
+                Enabled = false,
+                AutoReset = true,
+                Interval = 1000
+            };
+            timer.Elapsed += Timer_Elapsed;
         }
 
-        public void ChangeIpAddresAndPort(string ipAddress, int port)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            tcpClient.Connect(ipAddress, port);
+            if (rezult.IsCompleted == false)
+            {
+                countSeconds++;
+                if (countSeconds >= timeOutConnected)
+                {
+                    timer.Stop();
+                    countSeconds = 0;
+                    tcpClient.Close();
+                    ErrorConnection?.Invoke();
+                }
+            }
         }
 
         public void SendData(LedPwm ledPwm)
@@ -81,16 +101,33 @@ namespace ControlLED.Model
             }
         }
 
-        public void Connect()
+        public void ConnectCallback(IAsyncResult result)
         {
-            if (string.IsNullOrEmpty(IpAddress))
+            try
             {
-                return;
+                tcpClient.EndConnect(result);
+                networkStream = tcpClient.GetStream();
+                taskListenServer = new Task(ListenServer);
+                taskListenServer.Start();
+                timer.Stop();
+                countSeconds = 0;
+                SuccessfulConnection?.Invoke();
             }
-            tcpClient = new TcpClient(IpAddress, Port);
-            networkStream = tcpClient.GetStream();
-            taskListenServer = new Task(ListenServer);
-            taskListenServer.Start();
+            catch (Exception)
+            {
+                
+            }
+        }
+
+        public void Connect(string ipAddress, int port)
+        {
+            //tcpClient.Connect(IpAddress, Port);
+            //networkStream = tcpClient.GetStream();
+            //taskListenServer = new Task(ListenServer);
+            //taskListenServer.Start();
+            timer.Start();
+            tcpClient = new TcpClient();
+            rezult = tcpClient.BeginConnect(ipAddress, port, new AsyncCallback(ConnectCallback), tcpClient);
         }
     }
 }
